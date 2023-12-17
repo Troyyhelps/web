@@ -5,84 +5,42 @@
 </head>
 <body>
     <script>
-        // Define the path to your JSON file
-        var jsonFilePath = 'players.json';
+        // Define the URL to your JSON file
+        var jsonFileURL = 'https://troyyhelps.github.io/web/players.json';
 
-        // Check if the JSON file exists
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", jsonFilePath, true);
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    // Read the existing JSON data from the file
-                    var jsonFileContents = xhr.responseText;
+        // Check if guildid and num parameters are provided in the URL
+        var urlParams = new URLSearchParams(window.location.search);
+        var guildId = urlParams.get('guildid');
+        var room = urlParams.get('num');
+        var lolRoom = urlParams.get('lol');
 
-                    // Decode the JSON data into a JavaScript object
-                    var data = JSON.parse(jsonFileContents);
-
-                    // Check if guildid and num parameters are provided in the URL
-                    var urlParams = new URLSearchParams(window.location.search);
-                    var guildId = urlParams.get('guildid');
-                    var room = urlParams.get('num');
-                    var lolRoom = urlParams.get('lol');
-
-                    if (guildId !== null && room !== null) {
-                        // Update the JSON data with the provided values
-                        data[guildId] = room;
-
-                        // Encode the updated data as JSON
-                        var updatedJson = JSON.stringify(data, null, 2);
-
-                        // Send a POST request to update the JSON file
-                        var xhr2 = new XMLHttpRequest();
-                        xhr2.open("POST", "update.php", true);
-                        xhr2.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                        xhr2.onreadystatechange = function() {
-                            if (xhr2.readyState === 4) {
-                                if (xhr2.status === 200) {
-                                    // Data updated successfully
-                                    console.log("Data updated successfully.");
-                                } else {
-                                    // Error updating data
-                                    console.error("Error: Unable to update data.");
-                                }
-                            }
-                        };
-                        xhr2.send(updatedJson);
-                    } else if (lolRoom !== null) {
-                        // Update the JSON data with the 'lol' parameter
-                        data[lolRoom] = "0";
-
-                        // Encode the updated data as JSON
-                        var updatedJson = JSON.stringify(data, null, 2);
-
-                        // Send a POST request to update the JSON file
-                        var xhr2 = new XMLHttpRequest();
-                        xhr2.open("POST", "update.php", true);
-                        xhr2.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-                        xhr2.onreadystatechange = function() {
-                            if (xhr2.readyState === 4) {
-                                if (xhr2.status === 200) {
-                                    // Data updated successfully
-                                    console.log("Data updated successfully.");
-                                } else {
-                                    // Error updating data
-                                    console.error("Error: Unable to update data.");
-                                }
-                            }
-                        };
-                        xhr2.send(updatedJson);
-                    } else {
-                        // Display the current JSON data in raw format
-                        console.log(jsonFileContents);
-                    }
-                } else {
-                    // JSON file not found
-                    console.error("Error: JSON file not found.");
-                }
+        // Function to update JSON data
+        function updateData(data) {
+            if (guildId !== null && room !== null) {
+                // Update the JSON data with the provided values
+                data[guildId] = room;
+            } else if (lolRoom !== null) {
+                // Update the JSON data with the 'lol' parameter
+                data[lolRoom] = "0";
             }
-        };
-        xhr.send();
+
+            // Display the updated JSON data
+            console.log(data);
+
+            // If you want to save the changes to the JSON file on the server, you would need server-side code.
+            // GitHub Pages doesn't support server-side code execution, so you would need to host it elsewhere.
+        }
+
+        // Fetch the JSON file
+        fetch(jsonFileURL)
+            .then(response => response.json())
+            .then(data => {
+                // Update the JSON data
+                updateData(data);
+            })
+            .catch(error => {
+                console.error("Error fetching JSON file:", error);
+            });
     </script>
 </body>
 </html>
